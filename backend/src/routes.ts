@@ -1,42 +1,26 @@
 import { Router } from "express";
 import { prisma } from "./prisma";
-import bcrypt from "bcryptjs"; 
-
 
 const router = Router();
 
+// Teste simples
+router.get("/", (_req, res) => {
+  res.send("API funcionando!");
+});
 
 // GET todos os usuários
 router.get("/users", async (_req, res) => {
-  try {
-    const users = await prisma.user.findMany();
-    res.json(users);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Erro no servidor");
-  }
+  const users = await prisma.user.findMany();
+  res.json(users);
 });
 
 // POST criar usuário
 router.post("/users", async (req, res) => {
-
-const { name, email, password, createdAt } = req.body;
-const hashedPassword = await bcrypt.hash(password, 10);
-
-  try {
-    const newUser = await prisma.user.create({
-    data: {
-        name,
-        email,
-        password: hashedPassword,
-        createdAt
-    },
-    });
-    res.json(newUser);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Erro ao criar usuário");
-  }
+  const { name, email, password } = req.body;
+  const newUser = await prisma.user.create({
+    data: { name, email, password, createdAt: new Date() }
+  });
+  res.json(newUser);
 });
 
 export default router;
