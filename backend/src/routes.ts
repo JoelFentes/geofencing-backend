@@ -20,7 +20,7 @@ router.get("/users", async (_req, res) => {
 // POST criar usuário
 router.post("/users", async (req, res) => {
 
-const { name, email, password } = req.body;
+const { name, email, password, createdAt } = req.body;
 const hashedPassword = await bcrypt.hash(password, 10);
 
   try {
@@ -29,6 +29,7 @@ const hashedPassword = await bcrypt.hash(password, 10);
         name,
         email,
         password: hashedPassword,
+        createdAt
     },
     });
     res.json(newUser);
