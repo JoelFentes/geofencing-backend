@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { signupUser } from "../usecases/user/signupUser.usecase";
 import { listUsers } from "../usecases/user/listUsers.usecase";
+import { loginUser } from "../usecases/user/loginUser.usecase";
 
 export async function signupController(req: Request, res: Response) {
   try {
@@ -17,5 +18,15 @@ export async function listUsersController(req: Request, res: Response) {
     return res.json(users);
   } catch (error: any) {
     return res.status(500).json({ error: "Erro ao listar usuários" });
+  }
+}
+
+export async function loginController(req: Request, res: Response) {
+  try {
+    const { email, password } = req.body;
+    const result = await loginUser(email, password);
+    return res.json(result);
+  } catch (error: any) {
+    return res.status(400).json({ error: error.message });
   }
 }

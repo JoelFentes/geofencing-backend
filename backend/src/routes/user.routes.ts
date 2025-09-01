@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { signupController, listUsersController } from "../controllers/user.controller";
+import { signupController, listUsersController, loginController } from "../controllers/user.controller";
 
 const userRoutes = Router();
 
@@ -8,5 +8,8 @@ userRoutes.get("/", listUsersController);
 
 // POST criar usuário → /users/signup
 userRoutes.post("/signup", signupController);
+
+// Login
+userRoutes.post("/login", loginController);
 
 export default userRoutes;
