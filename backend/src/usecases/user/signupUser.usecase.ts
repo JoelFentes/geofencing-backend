@@ -1,3 +1,4 @@
+import bcrypt from "bcrypt";
 import { prisma } from "../../prisma/client";
 
 interface SignupI {
@@ -6,21 +7,25 @@ interface SignupI {
   password: string;
 }
 
-export async function signupUser({ name, email, password }: SignupI) {
+export async function signupUser(data: SignupI) {
   const userExists = await prisma.user.findUnique({
-    where: { email }
+    where: { email: data.email }
   });
 
   if (userExists) {
     throw new Error("E-mail já está em uso");
   }
 
-  return prisma.user.create({
+  const hashedPassword = await bcrypt.hash(data.password, 10);
+
+  const newUser = await prisma.user.create({
     data: {
-      name,
-      email,
-      password,
+      name: data.name,
+      email: data.email,
+      password: hashedPassword, 
       createdAt: new Date()
     }
   });
+
+  return newUser;
 }

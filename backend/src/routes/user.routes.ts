@@ -9,7 +9,7 @@ userRoutes.get("/", listUsersController);
 // POST criar usuário → /users/signup
 userRoutes.post("/signup", signupController);
 
-// Login
+// // POST logar usuário → /users/login
 userRoutes.post("/login", loginController);
 
 export default userRoutes;
