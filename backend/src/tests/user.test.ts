@@ -3,10 +3,6 @@ import app from "../index";
 import { prisma } from "../prisma/client";
 import bcrypt from "bcrypt";
 
-// Limpa usuários antes de cada teste
-beforeEach(async () => {
-  await prisma.user.deleteMany();
-});
 
 describe("User Controllers", () => {
   it("GET /users → deve retornar lista de usuários vazia inicialmente", async () => {
@@ -46,9 +42,6 @@ describe("User Controllers", () => {
     expect(response.body.error).toBe("E-mail já está em uso");
   });
 
-  // ===============================
-  // Teste de login
-  // ===============================
   it("POST /users/login → deve autenticar usuário com senha correta", async () => {
     // Cria usuário com senha criptografada
     const hashedPassword = await bcrypt.hash("123456", 10);
