@@ -8,9 +8,38 @@ datasource db {
 }
 
 model User {
-  id    Int    @id @default(autoincrement())
-  name  String
-  email String @unique
-  password String
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
   createdAt DateTime @default(now())
+
+  // relação 1:N → um usuário pode ter vários reminders
+  reminders Reminder[]
+}
+
+model Reminder {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  date        String
+  startTime   DateTime
+  endTime     DateTime
+  createdAt   DateTime @default(now())
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+
+  // cada reminder pode ter 0 ou 1 geofencing
+  geofencing Geofencing?
+}
+
+model Geofencing {
+  id        Int   @id @default(autoincrement())
+  latitude  Float
+  longitude Float
+  radius    Float
+
+  reminderId Int      @unique
+  reminder   Reminder @relation(fields: [reminderId], references: [id])
 }

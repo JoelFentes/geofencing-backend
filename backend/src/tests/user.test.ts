@@ -3,6 +3,11 @@ import app from "../index";
 import { prisma } from "../prisma/client";
 import bcrypt from "bcrypt";
 
+// Limpeza completa antes de cada teste
+beforeEach(async () => {
+  await prisma.$executeRaw`TRUNCATE TABLE "Reminder" CASCADE`;
+  await prisma.$executeRaw`TRUNCATE TABLE "User" CASCADE`;
+});
 
 describe("User Controllers", () => {
   it("GET /users → deve retornar lista de usuários vazia inicialmente", async () => {
@@ -12,29 +17,32 @@ describe("User Controllers", () => {
   });
 
   it("POST /users/signup → deve criar um usuário", async () => {
+    const email = `joel${Date.now()}@test.com`;
     const response = await request(app)
       .post("/api/users/signup")
       .send({
         name: "Joel",
-        email: "joel@test.com",
+        email,
         password: "123456"
       });
 
     expect(response.status).toBe(201);
     expect(response.body).toHaveProperty("id");
-    expect(response.body.email).toBe("joel@test.com");
+    expect(response.body.email).toBe(email);
   });
 
   it("POST /users/signup → não deve permitir e-mail duplicado", async () => {
+    const email = `joel${Date.now()}@test.com`;
+
     await request(app).post("/api/users/signup").send({
       name: "Joel",
-      email: "joel@test.com",
+      email,
       password: "123456"
     });
 
     const response = await request(app).post("/api/users/signup").send({
       name: "Outro",
-      email: "joel@test.com",
+      email,
       password: "654321"
     });
 
@@ -43,30 +51,33 @@ describe("User Controllers", () => {
   });
 
   it("POST /users/login → deve autenticar usuário com senha correta", async () => {
-    // Cria usuário com senha criptografada
+    const email = `joel${Date.now()}@test.com`;
     const hashedPassword = await bcrypt.hash("123456", 10);
+
     await prisma.user.create({
-      data: { name: "Joel", email: "joel@test.com", password: hashedPassword, createdAt: new Date() }
+      data: { name: "Joel", email, password: hashedPassword, createdAt: new Date() }
     });
 
     const response = await request(app).post("/api/users/login").send({
-      email: "joel@test.com",
+      email,
       password: "123456"
     });
 
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty("token");
-    expect(response.body.user.email).toBe("joel@test.com");
+    expect(response.body.user.email).toBe(email);
   });
 
   it("POST /users/login → deve falhar com senha incorreta", async () => {
+    const email = `joel${Date.now()}@test.com`;
     const hashedPassword = await bcrypt.hash("123456", 10);
+
     await prisma.user.create({
-      data: { name: "Joel", email: "joel@test.com", password: hashedPassword, createdAt: new Date() }
+      data: { name: "Joel", email, password: hashedPassword, createdAt: new Date() }
     });
 
     const response = await request(app).post("/api/users/login").send({
-      email: "joel@test.com",
+      email,
       password: "wrongpass"
     });
 
@@ -76,7 +87,7 @@ describe("User Controllers", () => {
 
   it("POST /users/login → deve falhar com e-mail inexistente", async () => {
     const response = await request(app).post("/api/users/login").send({
-      email: "naoexiste@test.com",
+      email: `naoexiste${Date.now()}@test.com`,
       password: "123456"
     });
 
