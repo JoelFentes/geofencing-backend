@@ -10,7 +10,9 @@ interface SignupI {
 export async function signupUser(data: SignupI) {
   const userExists = await prisma.user.findUnique({
     where: { email: data.email }
+    
   });
+  
 
   if (userExists) {
     throw new Error("E-mail já está em uso");
