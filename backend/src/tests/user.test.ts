@@ -5,8 +5,8 @@ import bcrypt from "bcrypt";
 
 // Limpeza completa antes de cada teste
 beforeEach(async () => {
-  await prisma.$executeRaw`TRUNCATE TABLE "Reminder" CASCADE`;
-  await prisma.$executeRaw`TRUNCATE TABLE "User" CASCADE`;
+  await prisma.reminder.deleteMany();
+  await prisma.user.deleteMany();
 });
 
 describe("User Controllers", () => {

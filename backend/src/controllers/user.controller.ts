@@ -14,6 +14,7 @@ export const signupController = async (req: Request, res: Response) => {
     res.status(400).json({ error: err.message });
   }
 };
+
 export async function listUsersController(req: Request, res: Response) {
   try {
     const users = await listUsers();
