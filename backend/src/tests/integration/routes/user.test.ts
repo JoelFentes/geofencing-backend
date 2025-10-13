@@ -1,6 +1,6 @@
 import request from "supertest";
-import app from "../index";
-import { prisma } from "../prisma/client";
+import app from "../../../index";
+import { prisma } from "../../../prisma/client";
 import bcrypt from "bcrypt";
 
 // Limpeza completa antes de cada teste
