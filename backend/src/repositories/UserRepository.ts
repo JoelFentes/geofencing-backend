@@ -2,6 +2,9 @@
 import { prisma } from "../prisma/client";
 
 export class UserRepository {
+  static update(userId: string | undefined, arg1: { name: any; photo: any; }) {
+    throw new Error("Method not implemented.");
+  }
   async findAll() {
     return prisma.user.findMany();
   }
@@ -11,4 +14,19 @@ export class UserRepository {
       data: { ...data, createdAt: new Date() }
     });
   }
+
+  async findById(id: string) {
+    return prisma.user.findUnique({ where: { id } });
+  }
+
+  async update(id: string, data: { name?: string; photo?: string }) {
+    return prisma.user.update({
+      where: { id },
+      data,
+    });
+  }
 }
+
+
+
+
