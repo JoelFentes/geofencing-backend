@@ -60,19 +60,22 @@ export class UserController {
         return res.status(400).json({ error: "Invalid userId" });
       }
 
-      const { name, photo } = req.body;
+      // RECEBE O JSON SIMPLES: name e photo (que é a URL final do Cloudinary)
+      const { name, photo } = req.body; 
 
       const updateUserUseCase = new UpdateUserUseCase(userRepository);
 
+      // O use case apenas salva a URL (string) que veio no corpo
       const user = await updateUserUseCase.execute({
         userId,
         name,
-        photo,
+        photo, // Já é a URL pública final
       });
 
       return res.json(user);
 
     } catch (err: any) {
+      console.error("Erro no updateUser:", err);
       return res.status(400).json({ error: err.message });
     }
   }
