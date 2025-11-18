@@ -8,7 +8,6 @@ async function test() {
     await prisma.$connect();
     console.log("✅ Conectado ao banco!");
 
-    // Tente buscar alguns usuários (ou outro model que exista)
     const users = await prisma.user.findMany();
     console.log("Users:", users);
   } catch (err) {

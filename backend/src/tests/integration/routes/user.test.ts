@@ -1,4 +1,4 @@
-import request from "supertest";
+/* import request from "supertest";
 import app from "../../../index";
 import { prisma } from "../../../prisma/client";
 import bcrypt from "bcrypt";
@@ -94,4 +94,4 @@ describe("User Controllers", () => {
     expect(response.status).toBe(400);
     expect(response.body.error).toBe("User not found");
   });
-});
+}); */

@@ -5,5 +5,8 @@ export async function createReminder(data: ReminderDTO) {
     throw new Error("Título e data são obrigatórios");
   }
 
-  return reminderRepository.create(data);
+  return reminderRepository.create({
+    ...data,
+    locations: [], 
+  });
 }

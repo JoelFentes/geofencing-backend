@@ -25,15 +25,20 @@ model Reminder {
   endTime     DateTime
   createdAt   DateTime    @default(now())
   userId      Int
-  geofencing  Geofencing?
+
+  geofencing  Geofencing[]  // 👈 agora é lista (pode ser 1 ou vários geofences)
+
   user        User        @relation(fields: [userId], references: [id])
 }
 
 model Geofencing {
-  id         Int      @id @default(autoincrement())
-  latitude   Float
-  longitude  Float
-  radius     Float
-  reminderId Int      @unique
-  reminder   Reminder @relation(fields: [reminderId], references: [id])
+  id          Int       @id @default(autoincrement())
+  reminderId  Int
+  latitude    Float
+  longitude   Float
+  radius      Int
+  createdAt   DateTime  @default(now())
+
+  reminder    Reminder  @relation(fields: [reminderId], references: [id])
 }
+
