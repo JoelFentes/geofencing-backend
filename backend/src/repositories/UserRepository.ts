@@ -15,11 +15,11 @@ export class UserRepository {
     });
   }
 
-  async findById(id: string) {
+  async findById(id: number) {
     return prisma.user.findUnique({ where: { id } });
   }
 
-  async update(id: string, data: { name?: string; photo?: string }) {
+  async update(id: number, data: { name?: string; photo?: string }) {
     return prisma.user.update({
       where: { id },
       data,
