@@ -15,9 +15,18 @@ export interface ReminderDTO {
   endTime: Date;
   userId: number;
 
-  locations?: GeofenceLocation[]; 
+geofencing?: GeofencingCreateBlock;
 }
 
+export type GeofencingCreate = {
+    latitude: number;
+    longitude: number;
+    radius: number;
+};
+
+export type GeofencingCreateBlock = {
+    create: GeofencingCreate[];
+};
 
 export const reminderRepository = {
   async create(data: ReminderDTO) {
