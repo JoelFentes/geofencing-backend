@@ -7,6 +7,5 @@ export async function createReminder(data: ReminderDTO) {
 
   return reminderRepository.create({
     ...data,
-    locations: [], 
   });
 }
