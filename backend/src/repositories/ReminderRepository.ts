@@ -27,7 +27,7 @@ export const reminderRepository = {
   async listByUser(userId: number) {
     return prisma.reminder.findMany({
       where: { userId },
-      include: { geofencing: true }, // ⬅️ agora sim traz as localizações
+      include: { geofencing: true }, 
       orderBy: { date: "asc" },
     });
   },

@@ -27,7 +27,7 @@ model Reminder {
   createdAt   DateTime    @default(now())
   userId      Int
 
-  geofencing  Geofencing[]  // 👈 agora é lista (pode ser 1 ou vários geofences)
+  geofencing  Geofencing[] 
 
   user        User        @relation(fields: [userId], references: [id])
 }
