@@ -1,17 +1,33 @@
 // repositories/UserRepository.ts
 import { prisma } from "../prisma/client";
 
+interface UserCreateData {
+  name: string;
+  email: string;
+  password: string;
+  photo?: string | null;
+}
+
+
 export class UserRepository {
-  static update(userId: string | undefined, arg1: { name: any; photo: any; }) {
-    throw new Error("Method not implemented.");
+  static update(userId: number, data: { name?: string; photo?: string }) 
+  {    
+    return prisma.user.update({
+        where: { id: userId },
+        data,
+    });
   }
   async findAll() {
     return prisma.user.findMany();
   }
 
-  async create(data: { name: string; email: string; password: string }) {
+  async create(data: UserCreateData) {
     return prisma.user.create({
-      data: { ...data, createdAt: new Date() }
+      data: { 
+        ...data, 
+        createdAt: new Date(),
+        photo: data.photo || null 
+      }
     });
   }
 

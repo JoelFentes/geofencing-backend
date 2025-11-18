@@ -50,10 +50,16 @@ export class UserController {
 
   async updateUser(req: Request, res: Response) {
     try {
-      const userId = req.userId;
-      if (!userId) {
+      const userIdStr = req.userId;
+      if (!userIdStr) {
         return res.status(401).json({ error: "Unauthorized: userId missing" });
       }
+
+      const userId = Number(userIdStr);
+      if (!Number.isInteger(userId) || userId <= 0) {
+        return res.status(400).json({ error: "Invalid userId" });
+      }
+
       const { name, photo } = req.body;
 
       const updateUserUseCase = new UpdateUserUseCase(userRepository);
