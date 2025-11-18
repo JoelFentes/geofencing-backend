@@ -2,9 +2,8 @@ import { reminderRepository, ReminderDTO } from "../../repositories/ReminderRepo
 
 export async function createReminderWithGeofencing(data: ReminderDTO) {
     
-    // 1. Desestrutura para isolar o campo 'locations' (que é obsoleto) e capturar o restante ('rest')
     // 'rest' contém title, date, userId e o bloco geofencing: { create: [...] }
-    const { locations, ...rest } = data; 
+    const {...rest } = data; 
     
     if (!rest.title || !rest.date) {
         throw new Error("Título e data são obrigatórios");

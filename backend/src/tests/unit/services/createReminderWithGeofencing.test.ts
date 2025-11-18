@@ -19,14 +19,7 @@ describe("createReminderWithGeofencing (unit)", () => {
       date: "2025-11-15",
       startTime: new Date(),
       endTime: new Date(),
-      locations: [
-        {
-          name: "Padaria Central",
-          latitude: -8.12345,
-          longitude: -35.98765,
-          radiusMeters: 150,
-        },
-      ],
+     
     };
 
     (reminderRepository.create as jest.Mock).mockResolvedValue(fakeReminder);
@@ -108,7 +101,6 @@ describe("createReminderWithGeofencing (unit)", () => {
         date: "2025-11-15",
         startTime: new Date(),
         endTime: new Date(),
-        locations: [], 
       })
     ).rejects.toThrow("É necessário ao menos 1 localização");
   });
