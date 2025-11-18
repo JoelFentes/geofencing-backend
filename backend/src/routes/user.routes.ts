@@ -13,7 +13,7 @@ userRoutes.get("/", listUsersController);
 // POST criar usuário → /users/signup
 userRoutes.post("/signup", signupController);
 
-// // POST logar usuário → /users/login
+// POST logar usuário → /users/login
 userRoutes.post("/login", loginController);
 
 userRoutes.put("/update", authMiddleware, (req, res) =>
