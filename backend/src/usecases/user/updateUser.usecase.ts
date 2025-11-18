@@ -1,7 +1,7 @@
 import { UserRepository } from "../../repositories/UserRepository";
 
 interface UpdateUserRequest {
-  userId: string;
+  userId: number;
   name?: string;
   photo?: string;
 }
