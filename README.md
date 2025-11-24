@@ -1,5 +1,3 @@
-
-
 # 🛰️ Orbit Notes – Backend
 
 O **Orbit Notes – Backend** é a API responsável por fornecer autenticação, gerenciamento de usuários, notas e lembretes baseados em geolocalização para o aplicativo mobile Orbit.
@@ -8,13 +6,23 @@ Este serviço foi desenvolvido com foco em escalabilidade e organização, utili
 
 ## 🛠️ Tecnologias
 
-  * **Node.js** & **Express**
-  * **TypeScript**
-  * **Prisma ORM** (PostgreSQL)
-  * **JWT** (Autenticação) & **Bcrypt** (Segurança)
-  * **Jest** (Testes Unitários e Mocks)
+* **Node.js** & **Express**
+* **TypeScript**
+* **Prisma ORM** (PostgreSQL)
+* **JWT** (Autenticação) & **Bcrypt** (Segurança)
+* **Jest** & **Supertest** (Testes Unitários e de Integração)
 
------
+---
+
+## ✨ Funcionalidades da Entrega Atual
+
+Nesta versão, foram implementados e testados os seguintes fluxos principais:
+
+1.  🆕 **CreateReminderWithGeofencing:** Lógica complexa que valida a existência de coordenadas geográficas antes de permitir a criação de um lembrete de localização.
+2.  🆕 **UpdateUser:** Permite que usuários autenticados atualizem seus dados cadastrais (nome e foto).
+3.  🆕 **ForgotPassword:** Fluxo de recuperação de conta que valida a existência do e-mail e gera um token de reset (simulado).
+
+---
 
 ## 🗺️ Mapeamento de Serviços e Casos de Uso
 
@@ -24,14 +32,14 @@ Abaixo, a relação entre os serviços implementados e os problemas que eles res
 | :--- | :--- | :--- |
 | **Auth / User** | **Registrar Usuário** | Criação de conta com criptografia de senha e suporte a foto de perfil. |
 | | **Autenticação (Login)** | Validação de credenciais e emissão de token JWT (duração 24h). |
+| | **Atualizar Perfil** (🆕) | Alteração de nome e foto de perfil de um usuário autenticado. |
+| | **Recuperar Senha** (🆕) | Validação de e-mail e geração de token para redefinição de senha. |
 | | **Listagem de Usuários** | Visualização de todos os usuários cadastrados (Admin/Debug). |
-| | **Atualizar Perfil** | Alteração de nome e foto de perfil de um usuário autenticado. |
-| **Reminders** | **Criar Lembrete (Simples)** | Cria um lembrete básico com título e data. |
-| | **Criar com Geofencing** | Cria lembrete vinculado a coordenadas (latitude/longitude/raio). |
+| **Reminders** | **Criar com Geofencing** (🆕) | Cria lembrete vinculado obrigatoriamente a uma geofence (lat/long/raio). |
 | | **Listar Lembretes** | Busca todos os lembretes ativos de um ID de usuário específico. |
 | | **Excluir Lembrete** | Remoção lógica ou física de um lembrete, validando a posse do usuário. |
 
------
+---
 
 ## 🚀 Documentação da API (Endpoints)
 
@@ -39,11 +47,10 @@ Baseado na implementação atual das rotas (`userRoutes` e `reminderRoutes`).
 
 ### 👤 Usuários (`/users`)
 
-#### 1\. Criar Usuário (Signup)
-
-  * **Rota:** `POST /users/signup`
-  * **Descrição:** Cria um novo usuário no banco de dados.
-  * **Body:**
+#### 1. Criar Usuário (Signup)
+* **Rota:** `POST /users/signup`
+* **Descrição:** Cria um novo usuário no banco de dados.
+* **Body:**
     ```json
     {
       "name": "Maria Silva",
@@ -52,51 +59,39 @@ Baseado na implementação atual das rotas (`userRoutes` e `reminderRoutes`).
       "photo": "url_da_foto_opcional"
     }
     ```
-  * **Regras:**
-      * Verifica se o e-mail já existe.
-      * Senha é salva criptografada (hash).
 
-#### 2\. Autenticação (Login)
+#### 2. Autenticação (Login)
+* **Rota:** `POST /users/login`
+* **Response (200):** Retorna objeto `user` e o `token`.
 
-  * **Rota:** `POST /users/login`
-  * **Descrição:** Autentica o usuário.
-  * **Body:**
-    ```json
-    {
-      "email": "maria@email.com",
-      "password": "senha_segura"
-    }
-    ```
-  * **Response (200):** Retorna objeto `user` e o `token`.
-
-#### 3\. Atualizar Usuário
-
-  * **Rota:** `PUT /users/update`
-  * **Headers:** `Authorization: Bearer <token>`
-  * **Descrição:** Atualiza dados cadastrais.
-  * **Body:**
+#### 3. Atualizar Usuário (🆕)
+* **Rota:** `PUT /users/update`
+* **Headers:** `Authorization: Bearer <token>`
+* **Descrição:** Atualiza dados cadastrais do usuário logado.
+* **Body:**
     ```json
     {
       "userId": 1,
-      "name": "Maria S.",
-      "photo": "nova_url_foto"
+      "name": "Maria Souza",
+      "photo": "nova_url_foto.png"
     }
     ```
 
-#### 4\. Listar Todos
+#### 4. Recuperar Senha (🆕)
+* **Rota:** `POST /users/forgot-password`
+* **Descrição:** Verifica se o e-mail existe e inicia o fluxo de recuperação.
+* **Body:** `{"email": "maria@email.com"}`
+* **Response:** Retorna o token de reset (simulação).
 
-  * **Rota:** `GET /users/`
-  * **Descrição:** Retorna lista de usuários ordenada por criação (decrescente).
-
------
+---
 
 ### 📍 Lembretes (`/reminders`)
 
-#### 1\. Criar Lembrete (Com ou sem Geofencing)
-
-  * **Rota:** `POST /reminders/`
-  * **Descrição:** Cria um lembrete. Suporta lógica condicional para geofencing.
-  * **Body (Exemplo com Geofence):**
+#### 1. Criar Lembrete com Geofencing (🆕)
+* **Rota:** `POST /reminders/`
+* **Descrição:** Cria um lembrete vinculado a uma localização geográfica.
+* **Regra de Negócio:** O campo `geofencing` deve conter ao menos uma coordenada válida, caso contrário o sistema rejeita a criação.
+* **Body:**
     ```json
     {
       "title": "Comprar leite",
@@ -113,47 +108,42 @@ Baseado na implementação atual das rotas (`userRoutes` e `reminderRoutes`).
       }
     }
     ```
-  * **Regras de Negócio:**
-      * `title` e `date` são obrigatórios.
-      * Se enviar objeto `geofencing`, deve conter ao menos 1 local.
 
-#### 2\. Listar Lembretes do Usuário
+#### 2. Listar e Excluir
+* **GET** `/reminders/:userId` - Lista lembretes do usuário.
+* **DELETE** `/reminders/:id/:userId` - Apaga um lembrete (apenas se pertencer ao usuário).
 
-  * **Rota:** `GET /reminders/:userId`
-  * **Parâmetros:** `userId` (ID numérico do usuário).
-  * **Descrição:** Retorna todos os lembretes vinculados àquele ID.
-
-#### 3\. Excluir Lembrete
-
-  * **Rota:** `DELETE /reminders/:id/:userId`
-  * **Parâmetros:**
-      * `id`: ID do lembrete.
-      * `userId`: ID do usuário (para garantir que ninguém apague lembrete de outro).
-  * **Erro:** Retorna erro se o lembrete não for encontrado ou não pertencer ao usuário.
-
------
+---
 
 ## 🧪 Testes e Qualidade de Código
 
-O projeto utiliza **Jest** para testes unitários. A estratégia adotada utiliza **Mocks** para isolar as regras de negócio, simulando o comportamento do banco de dados (`Prisma`) e bibliotecas externas (`bcrypt`, `jsonwebtoken`).
+O projeto utiliza uma abordagem híbrida de testes para garantir a qualidade do software, utilizando **Jest** para testes unitários e **Supertest** para testes de integração.
 
-Isso garante que os testes sejam rápidos e não dependam de uma conexão real com o banco de dados.
+### 1. Testes Unitários (Unit Tests)
+A estratégia adotada utiliza **Mocks** para isolar as regras de negócio, simulando o comportamento do banco de dados (`Prisma`) e bibliotecas externas (`bcrypt`, `jsonwebtoken`). Isso garante que os testes sejam rápidos e não dependam de uma conexão real.
 
-### 📂 Cobertura dos Testes
+#### 📂 Cobertura dos Testes Unitários
 
-Os testes implementados cobrem os seguintes cenários:
+**🔐 Autenticação e Usuários (`UserUseCase`)**
+* ✅ **Signup:** Criação de usuário com sucesso e bloqueio de e-mails duplicados.
+* ✅ **Login:** Geração de token JWT válida e bloqueio de credenciais incorretas.
+* ✅ **UpdateUser (🆕):** Atualização de perfil mockada com sucesso.
+* ✅ **ForgotPassword (🆕):** Geração de token simulado apenas para e-mails existentes.
 
-#### 🔐 Autenticação e Usuários (`UserUseCase`)
+**⏰ Lembretes (`ReminderUseCase`)**
+* ✅ **Geofencing (🆕):** Validação rígida garantindo que o lembrete tenha coordenadas lat/long válidas.
+* ✅ **Criação:** Sucesso ao criar com dados completos.
+* ✅ **Exclusão:** Garantia de que apenas o dono do lembrete pode excluí-lo.
 
-  * ✅ **Signup:** Criação de usuário com sucesso (senha hasheada) e bloqueio de e-mails duplicados.
-  * ✅ **Login:** Geração de token JWT válida e bloqueio de credenciais incorretas ou usuários inexistentes.
-  * ✅ **Listagem:** Retorno ordenado de usuários.
+### 2. Testes de Integração (E2E - Live API)
+Utilizamos **Supertest** para testar a **API real hospedada na nuvem** (Render). O foco é validar o fluxo completo em produção.
 
-#### ⏰ Lembretes (`ReminderUseCase`)
+#### 📂 Cobertura dos Testes de Integração
+* ✅ **Cadastro Real:** Criação de usuário no banco da nuvem.
+* ✅ **Login Real:** Obtenção de Token JWT válido do servidor.
+* ✅ **Fluxo Completo:** Uso do Token recebido para criar um Lembrete com Geofencing autenticado.
 
-  * ✅ **Criação:** Sucesso ao criar com dados completos e validação de campos obrigatórios (`title`, `date`).
-  * ✅ **Listagem:** Filtro correto de lembretes por `userId`.
-  * ✅ **Exclusão:** Garantia de que apenas o dono do lembrete pode excluí-lo.
+---
 
 ### 📝 Exemplo de Teste (Unitário com Mock)
 
@@ -186,12 +176,20 @@ it("deve criar um novo usuário com senha criptografada", async () => {
   expect(bcrypt.hash).toHaveBeenCalledWith("123456", 10);
   expect(result.password).toEqual("hashedpass");
 });
-```
+````
 
 ### 🏃‍♂️ Como rodar os testes
 
+**Testes Unitários:**
+
 ```bash
 npm test
+```
+
+**Testes de Integração (Live API):**
+
+```bash
+npm run test:integration
 ```
 
 -----
@@ -225,17 +223,16 @@ npm test
 
 -----
 
-# Protótipo Figma
+## 🎨 Protótipo e Diagramas
 
+### Protótipo Figma
 
-<img width="1767" height="629" alt="image" src="https://github.com/user-attachments/assets/cb0260b4-83f0-494c-abec-c9f89767ffe5" />
+\<img width="1767" height="629" alt="image" src="https://github.com/user-attachments/assets/cb0260b4-83f0-494c-abec-c9f89767ffe5" /\>
 
+### Diagrama de Caso de Uso
 
------
-
-# Diagrama de Caso de Uso
-
-<img width="1103" height="711" alt="image" src="https://github.com/user-attachments/assets/301477f7-9c7a-4fa9-b8f2-c30157470b62" />
-
+\<img width="1103" height="711" alt="image" src="https://github.com/user-attachments/assets/301477f7-9c7a-4fa9-b8f2-c30157470b62" /\>
 
 *Documentação gerada para fins acadêmicos – Projeto Orbit Notes.*
+
+```
