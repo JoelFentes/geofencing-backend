@@ -1,10 +1,4 @@
-Excelente\! O fato de você ter testes unitários que utilizam **Mocks** (simulando o Prisma e o Bcrypt) valoriza muito o projeto, pois demonstra conhecimento avançado de testes isolados.
 
-Atualizei o README para incluir uma seção de **Testes** muito mais robusta, descrevendo a estratégia de *Mocking* e listando exatamente os cenários que você implementou.
-
-Aqui está a versão final do **README.md**:
-
------
 
 # 🛰️ Orbit Notes – Backend
 
