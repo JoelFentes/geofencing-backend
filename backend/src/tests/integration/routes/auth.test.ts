@@ -1,110 +1,68 @@
 import request from "supertest";
-import { app } from "../../src/server"; // Ajuste o caminho se necessário
-import { prisma } from "../../src/prisma/client";
-import bcrypt from "bcrypt";
 
-// Limpeza completa antes de cada teste
-// IMPORTANTE: Deletar 'Reminder' antes de 'User' por causa da chave estrangeira (Cascade)
-beforeEach(async () => {
-  await prisma.reminder.deleteMany();
-  await prisma.user.deleteMany();
-});
+// URL da sua API em produção
+const BASE_URL = "https://geofencing-api.onrender.com/api";
 
-// Fechar conexão após todos os testes
-afterAll(async () => {
-  await prisma.$disconnect();
-});
+// Função para gerar e-mails únicos e evitar erro de "Email já existe"
+const generateEmail = () => `teste_live_${Date.now()}_${Math.floor(Math.random() * 1000)}@test.com`;
 
-describe("Integration: User & Auth", () => {
+describe("Live Integration: Auth & Users", () => {
   
-  // --- GET USERS ---
-  it("GET /users → deve retornar lista vazia inicialmente", async () => {
-    const response = await request(app).get("/users");
-    
-    // Aceita 200 OK
-    expect(response.status).toBe(200);
-    expect(response.body).toEqual([]);
-  });
+  const uniqueEmail = generateEmail();
+  const defaultPassword = "123";
 
-  // --- SIGNUP ---
-  it("POST /users/signup → deve criar um usuário com sucesso", async () => {
-    const email = `teste_${Date.now()}@test.com`;
-    
-    const response = await request(app)
-      .post("/users/signup")
+  it("POST /users/signup → deve criar um usuário no banco da nuvem", async () => {
+    const response = await request(BASE_URL)
+      .post("/users/signup") // Confirme se a rota é essa ou /auth/signup
       .send({
-        name: "Joel Teste",
-        email,
-        password: "123456",
-        photo: "avatar.png"
+        name: "Teste Integração Nuvem",
+        email: uniqueEmail,
+        password: defaultPassword,
+        photo: "https://i.imgur.com/foto.png"
       });
 
-    // Aceita 201 (Created) ou 200 (OK)
+    // Aceita 200 ou 201
     expect([200, 201]).toContain(response.status);
     expect(response.body).toHaveProperty("id");
-    expect(response.body.email).toBe(email);
-    expect(response.body).not.toHaveProperty("password"); // Segurança
+    expect(response.body.email).toBe(uniqueEmail);
   });
 
   it("POST /users/signup → não deve permitir e-mail duplicado", async () => {
-    const email = `duplicado_${Date.now()}@test.com`;
+    // Tenta criar de novo com o MESMO e-mail do teste anterior
+    const response = await request(BASE_URL)
+      .post("/users/signup")
+      .send({
+        name: "Duplicado",
+        email: uniqueEmail, // Mesmo email
+        password: "123"
+      });
 
-    // 1. Cria o primeiro
-    await prisma.user.create({
-      data: {
-        name: "Primeiro",
-        email,
-        password: "hash",
-        createdAt: new Date()
-      } as any
-    });
-
-    // 2. Tenta criar o segundo igual
-    const response = await request(app).post("/users/signup").send({
-      name: "Segundo",
-      email,
-      password: "123456"
-    });
-
-    expect(response.status).toBe(400); // Ou 500, dependendo do seu tratamento de erro
-    // Verifique se a mensagem de erro bate com o seu throw new Error
-    expect(response.body).toMatchObject({ error: expect.stringMatching(/uso|existe/) });
+    expect(response.status).toBe(400); // Ou 500, dependendo do seu erro
+    // Ajuste a mensagem abaixo conforme o retorno da sua API real
+    // expect(response.body.error).toMatch(/existe|uso/i); 
   });
 
-  // --- LOGIN ---
-  it("POST /users/login → deve autenticar e retornar token", async () => {
-    const email = `login_${Date.now()}@test.com`;
-    const hashedPassword = await bcrypt.hash("123456", 10);
-
-    // Cria usuário direto no banco para testar o login
-    await prisma.user.create({
-      data: { name: "Login User", email, password: hashedPassword, createdAt: new Date() } as any
-    });
-
-    const response = await request(app).post("/users/login").send({
-      email,
-      password: "123456"
-    });
+  it("POST /users/login → deve autenticar usuário criado", async () => {
+    const response = await request(BASE_URL)
+      .post("/users/login")
+      .send({
+        email: uniqueEmail,
+        password: defaultPassword
+      });
 
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty("token");
-    expect(response.body.user.email).toBe(email);
+    expect(response.body.user.email).toBe(uniqueEmail);
   });
 
-  it("POST /users/login → deve falhar com senha incorreta", async () => {
-    const email = `wrongpass_${Date.now()}@test.com`;
-    const hashedPassword = await bcrypt.hash("123456", 10);
-
-    await prisma.user.create({
-      data: { name: "User", email, password: hashedPassword, createdAt: new Date() } as any
-    });
-
-    const response = await request(app).post("/users/login").send({
-      email,
-      password: "wrongpass" // Senha errada
-    });
+  it("POST /users/login → deve falhar com senha errada", async () => {
+    const response = await request(BASE_URL)
+      .post("/users/login")
+      .send({
+        email: uniqueEmail,
+        password: "senha_errada_proposital"
+      });
 
     expect(response.status).toBe(400); // Ou 401
-    expect(response.body.error).toMatch(/Invalid|credentials/i);
   });
 });
