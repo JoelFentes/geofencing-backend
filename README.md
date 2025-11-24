@@ -227,10 +227,13 @@ npm run test:integration
 
 ### Protótipo Figma
 
-<img width="1767" height="629" alt="image" src="https://github.com/user-attachments/assets/cb0260b4-83f0-494c-abec-c9f89767ffe5" /\>
+<img width="1767" height="629" alt="image" src="https://github.com/user-attachments/assets/cb0260b4-83f0-494c-abec-c9f89767ffe5" />
 
-### Diagrama de Caso de Uso
 
-<img width="1103" height="711" alt="image" src="https://github.com/user-attachments/assets/301477f7-9c7a-4fa9-b8f2-c30157470b62" /\>
+-----
+
+# Diagrama de Caso de Uso
+
+<img width="1103" height="711" alt="image" src="https://github.com/user-attachments/assets/301477f7-9c7a-4fa9-b8f2-c30157470b62" />
 
 *Documentação gerada para fins acadêmicos – Projeto Orbit Notes.*
